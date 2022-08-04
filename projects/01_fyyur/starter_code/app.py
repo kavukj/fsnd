@@ -4,6 +4,7 @@
 #----------------------------------------------------------------------------#
 
 from email.policy import default
+from os import abort
 from traceback import print_tb
 from black import err
 from sqlalchemy import exc
@@ -105,7 +106,6 @@ app.jinja_env.filters['datetime'] = format_datetime
 def index():
   return render_template('pages/home.html')
 
-
 #  Venues
 #  ----------------------------------------------------------------
 
@@ -191,15 +191,33 @@ def create_venue_submission():
   # see: http://flask.pocoo.org/docs/1.0/patterns/flashing/
   return render_template('pages/home.html')
 
-@app.route('/venues/<venue_id>', methods=['DELETE'])
+@app.route('/venues/delete/<venue_id>', methods=['DELETE'])
 def delete_venue(venue_id):
+  error = False
+  try:
+    show = Show.query.filter_by(venue_id=venue_id)
+    show.delete()
+    venue = Venue.query.filter_by(id=venue_id)
+    venue.delete()
+    db.session.commit()
+  except SQLAlchemyError as e:
+    print(e)
+    error = True
+    db.session.rollback()
+  finally:
+    db.session.close()
+  if error:
+    flash("Venue could not be deleted") 
+    abort(500)
+  else:
+    flash("Venue deleted !") 
+    return jsonify({'success':True})
   # TODO: Complete this endpoint for taking a venue_id, and using
   # SQLAlchemy ORM to delete a record. Handle cases where the session commit could fail.
 
   # BONUS CHALLENGE: Implement a button to delete a Venue on a Venue Page, have it so that
   # clicking that button delete it from the db then redirect the user to the homepage
-  return None
-
+    
 #  Artists
 #  ----------------------------------------------------------------
 @app.route('/artists')
