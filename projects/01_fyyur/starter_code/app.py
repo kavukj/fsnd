@@ -38,7 +38,7 @@ migrate = Migrate(app,db)
 # Models.
 #----------------------------------------------------------------------------#
 class Show(db.Model):
-    __tablename__ = 'shows'
+    __tablename__ = 'Show'
 
     id = db.Column(db.Integer, primary_key=True)
     artist_id = db.Column(db.Integer, db.ForeignKey('Artist.id'), nullable=False)
@@ -183,12 +183,38 @@ def create_venue_form():
 def create_venue_submission():
   # TODO: insert form data as a new Venue record in the db, instead
   # TODO: modify data to be the data object returned from db insertion
+  error = False
+  try:
+    name = request.form['name']
+    city=request.form['city']
+    state = request.form['state']
+    address = request.form['address']
+    genres =  request.form.getlist('genres')
+    phone = request.form['phone']
+    facebook_link = request.form['facebook_link']
+    image_link = request.form['image_link']
+    website_link = request.form['website_link']
+    seeking_description = request.form['seeking_description']
+    seeking_talent = bool(request.form.get('seeking_talent',False))
+  
+    venue = Venue(name=name,city=city,state=state,address=address,phone=phone,
+    facebook_link=facebook_link,image_link=image_link,website_link=website_link,
+    description=seeking_description,seeking_talent=seeking_talent,genres=genres)
 
+    db.session.add(venue)
+    db.session.commit()
+  except:
+    error=True
+    db.session.rollback()
+    print(sys.exc_info())
+  finally:
+    db.session.close()
+  if error:
+    flash('An error occurred. Venue ' + request.form['name'] + ' could not be listed.')
+    print(error)
+  else:
   # on successful db insert, flash success
-  flash('Venue ' + request.form['name'] + ' was successfully listed!')
-  # TODO: on unsuccessful db insert, flash an error instead.
-  # e.g., flash('An error occurred. Venue ' + data.name + ' could not be listed.')
-  # see: http://flask.pocoo.org/docs/1.0/patterns/flashing/
+    flash('Venue ' + request.form['name'] + ' was successfully listed!')
   return render_template('pages/home.html')
 
 @app.route('/venues/delete/<venue_id>', methods=['DELETE'])
