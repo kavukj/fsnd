@@ -1,4 +1,6 @@
 from datetime import datetime
+from email.policy import default
+from pickle import TRUE
 from flask_wtf import Form
 from wtforms import StringField, SelectField, SelectMultipleField, DateTimeField, BooleanField
 from wtforms.validators import DataRequired, AnyOf, URL
@@ -120,7 +122,7 @@ class VenueForm(Form):
         'website_link'
     )
 
-    seeking_talent = BooleanField( 'seeking_talent' )
+    seeking_talent = BooleanField( 'seeking_talent')
 
     seeking_description = StringField(
         'seeking_description'
