@@ -72,6 +72,7 @@ class Venue(db.Model):
     seeking_talent = db.Column(db.Boolean(), default=False)
     description = db.Column(db.String(300))
     shows = db.relationship("Show", backref="venue", lazy=True)
+    created_at = db.Column(db.DateTime(), nullable= True)
 
     # TODO: implement any missing fields, as a database migration using Flask-Migrate
 
@@ -91,6 +92,7 @@ class Artist(db.Model):
     seeking_venue = db.Column(db.Boolean(), default=False)
     description = db.Column(db.String(300))
     shows = db.relationship("Show", backref="artist", lazy=True)
+    created_at = db.Column(db.DateTime(), nullable= True)
     # TODO: implement any missing fields, as a database migration using Flask-Migrate
 
 
@@ -119,7 +121,9 @@ app.jinja_env.filters["datetime"] = format_datetime
 
 @app.route("/")
 def index():
-    return render_template("pages/home.html")
+  artists = Artist.query.order_by(Artist.created_at.desc()).limit(10).all()
+  venues = Venue.query.order_by(Venue.created_at.desc()).limit(10).all()
+  return render_template("pages/home.html",artists=artists, venues= venues)
 
 
 #  Venues
@@ -241,6 +245,7 @@ def create_venue_submission():
             description=seeking_description,
             seeking_talent=seeking_talent,
             genres=genres,
+            created_at =  datetime.now()
         )
 
         db.session.add(venue)
