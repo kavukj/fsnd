@@ -308,6 +308,8 @@ def search_artists():
         searchTerm = request.form.get("search_term")
         search_data = Artist.query.filter(
             Artist.name.ilike("%{}%".format(searchTerm))
+            | Artist.city.ilike("%{}%".format(searchTerm))
+            | Artist.state.ilike("%{}%".format(searchTerm))
         ).all()
         data = []
         for artist in search_data:
