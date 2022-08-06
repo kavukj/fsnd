@@ -17,7 +17,6 @@ from flask import (
     Flask,
     render_template,
     request,
-    Response,
     flash,
     redirect,
     url_for,
@@ -526,6 +525,23 @@ def create_show_submission():
 
     return render_template("pages/home.html")
 
+@app.route('/show/search', methods=["POST"])
+def search_shows():
+    search_term = request.form.get('search_term')
+    search_show = Show.query.all()
+    data=[]
+    for show in search_show:
+        if((search_term.lower() in show.artist.name.lower()) | (search_term.lower() in show.venue.name.lower()) ):
+            data.append({
+                'artist_name':show.artist.name,
+                'venue_name':show.venue.name,
+                'artist_image_link':show.artist.image_link,
+                'start_time':show.start_time.strftime("%Y-%m-%d %H:%M:%S"),
+                'venue_id':show.venue_id,
+                'artist_id':show.artist_id
+            })
+
+    return render_template('/pages/search_show.html', shows=data, search_term = search_term , search_count = len(data))
 #  Error
 #  ----------------------------------------------------------------
 
