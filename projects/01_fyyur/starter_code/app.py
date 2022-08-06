@@ -17,6 +17,7 @@ from flask import (
     Flask,
     render_template,
     request,
+    Response,
     flash,
     redirect,
     url_for,
@@ -29,7 +30,7 @@ from logging import Formatter, FileHandler
 from flask_wtf import Form
 from forms import *
 from flask_migrate import Migrate
-from model import Show,Venue,Artist
+from model import db,Artist,Venue,Show
 
 # ----------------------------------------------------------------------------#
 # App Config.
@@ -153,12 +154,10 @@ def show_venue(venue_id):
 #  Create Venue
 #  ----------------------------------------------------------------
 
-
 @app.route("/venues/create", methods=["GET"])
 def create_venue_form():
     form = VenueForm()
     return render_template("forms/new_venue.html", form=form)
-
 
 @app.route("/venues/create", methods=["POST"])
 def create_venue_submission():
@@ -210,7 +209,6 @@ def create_venue_submission():
         # on successful db insert, flash success
         flash("Venue " + request.form["name"] + " was successfully listed!")
     return render_template("pages/home.html")
-
 
 @app.route("/venues/delete/<venue_id>", methods=["DELETE"])
 def delete_venue(venue_id):
@@ -339,7 +337,7 @@ def edit_artist_submission(artist_id):
     # artist record with ID <artist_id> using the new attributes
     error = False
     try:
-        artist = Artist.query.get(artist_id)
+        artist = db.session.query(Artist).get(artist_id)
         artist.name = request.form["name"]
         artist.city = request.form["city"]
         artist.state = request.form["state"]
@@ -351,7 +349,9 @@ def edit_artist_submission(artist_id):
         artist.description = request.form["seeking_description"]
         artist.seeking_venue = bool(request.form.get("seeking_venue"))
         db.session.commit()
-    except:
+        print(artist.name)
+    except SQLAlchemyError as e:
+        print(e)
         error = True
         db.session.rollback()
         print(sys.exc_info())
@@ -393,7 +393,7 @@ def edit_venue_submission(venue_id):
     # venue record with ID <venue_id> using the new attributes
     error = False
     try:
-        venue = Venue.query.get(venue_id)
+        venue = db.session.query(Venue).get(venue_id)
         venue.name = request.form["name"]
         venue.city = request.form["city"]
         venue.state = request.form["state"]
