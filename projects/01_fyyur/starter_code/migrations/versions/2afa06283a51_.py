@@ -41,7 +41,6 @@ def upgrade():
     sa.Column('facebook_link', sa.String(length=120), nullable=True),
     sa.PrimaryKeyConstraint('id')
     )
-    op.drop_table('artist')
     # ### end Alembic commands ###
 
 
