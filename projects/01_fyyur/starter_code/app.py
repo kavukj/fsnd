@@ -215,38 +215,36 @@ def edit_venue(venue_id):
 def edit_venue_submission(venue_id):
     # TODO: take values from the form submitted, and update existing
     # venue record with ID <venue_id> using the new attributes
-    error = False
-    try:
-        venue = db.session.query(Venue).get(venue_id)
-        venue.name = request.form["name"]
-        venue.city = request.form["city"]
-        venue.state = request.form["state"]
-        venue.address = request.form["address"]
-        venue.genres = request.form.getlist("genres")
-        venue.phone = request.form["phone"]
-        venue.facebook_link = request.form["facebook_link"]
-        venue.image_link = request.form["image_link"]
-        venue.website_link = request.form["website_link"]
-        venue.description = request.form["seeking_description"]
-        venue.seeking_talent = bool(request.form.get("seeking_talent"))
+    form = VenueForm(request.form)
+    if form.validate():
+        try:
+            venue = db.session.query(Venue).get(venue_id)
+            venue.name = form.name.data
+            venue.city = form.city.data
+            venue.state = form.state.data
+            venue.address = form.address.data
+            venue.genres = form.genres.data
+            venue.phone = form.phone.data
+            venue.facebook_link = form.facebook_link.data
+            venue.image_link = form.image_link.data
+            venue.website_link = form.website_link.data
+            venue.seeking_description = form.seeking_description.data
+            venue.seeking_talent = form.seeking_talent.data
 
-        db.session.commit()
-    except:
-        error = True
-        db.session.rollback()
-        print(sys.exc_info())
-    finally:
-        db.session.close()
-    if error:
+            db.session.commit()
+        except:
+            db.session.rollback()
+            print(sys.exc_info())
+        finally:
+            db.session.close()
+        # on successful db insert, flash success
+        flash("Venue " + request.form["name"] + " was successfully updated!")
+    else:
         flash(
             "An error occurred. Venue "
             + request.form["name"]
             + " could not be updated."
         )
-        print(error)
-    else:
-        # on successful db insert, flash success
-        flash("Venue " + request.form["name"] + " was successfully updated!")
     return redirect(url_for("show_venue", venue_id=venue_id))
 
 @app.route("/venues/delete/<venue_id>", methods=["DELETE"])
@@ -418,36 +416,34 @@ def edit_artist(artist_id):
 def edit_artist_submission(artist_id):
     # TODO: take values from the form submitted, and update existing
     # artist record with ID <artist_id> using the new attributes
-    error = False
-    try:
-        artist = db.session.query(Artist).get(artist_id)
-        artist.name = request.form["name"]
-        artist.city = request.form["city"]
-        artist.state = request.form["state"]
-        artist.genres = request.form.getlist("genres")
-        artist.phone = request.form["phone"]
-        artist.facebook_link = request.form["facebook_link"]
-        artist.image_link = request.form["image_link"]
-        artist.website_link = request.form["website_link"]
-        artist.description = request.form["seeking_description"]
-        artist.seeking_venue = bool(request.form.get("seeking_venue"))
-        db.session.commit()
-        print(artist.name)
-    except SQLAlchemyError as e:
-        print(e)
-        error = True
-        db.session.rollback()
-        print(sys.exc_info())
-    finally:
-        db.session.close()
-    if error:
+    form = ArtistForm(request.form)
+    if form.validate():
+        try:
+            artist = db.session.query(Artist).get(artist_id)
+            artist.name = form.name.data
+            artist.city = form.city.data
+            artist.state = form.state.data
+            artist.genres = form.genres.data
+            artist.phone = form.phone.data
+            artist.facebook_link = form.facebook_link.data
+            artist.image_link = form.image_link.data
+            artist.website_link = form.website_link.data
+            artist.seeking_description = form.seeking_description.data
+            artist.seeking_venue = form.seeking_venue.data
+            db.session.commit()
+        except SQLAlchemyError as e:
+            print(e)
+            db.session.rollback()
+            print(sys.exc_info())
+        finally:
+            db.session.close()
+        flash("Artist " + request.form["name"] + " was successfully updated!")
+    else:
         flash(
             "An error occurred. Artist "
             + request.form["name"]
             + " could not be updated."
         )
-    if not error:
-        flash("Artist " + request.form["name"] + " was successfully updated!")
     return redirect(url_for("show_artist", artist_id=artist_id))
 
 #  Shows
