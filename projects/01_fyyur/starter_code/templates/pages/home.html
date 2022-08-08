@@ -25,7 +25,7 @@
 </div>
 <div class="row">
 	<div class="col-sm-6">
-		<p class="h4">Recently Visited Venues</p>
+		<p class="h4">Recently Listed Venues</p>
 		{% for venue in venues %}
 		<div class="small">
 			<a href="/venues/{{venue.id}}">{{venue.name}}</a>
@@ -33,7 +33,7 @@
 		{% endfor %}
 	</div>
 	<div class="col-sm-6">
-		<p class="h4">Recently Visited Artists</p>
+		<p class="h4">Recently Listed Artists</p>
 		{% for artist in artists %}
 		<div class="small">
 			<a href="/artists/{{artist.id}}">{{artist.name}}</a>
