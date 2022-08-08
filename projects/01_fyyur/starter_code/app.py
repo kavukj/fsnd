@@ -146,51 +146,48 @@ def create_venue_submission():
     # TODO: insert form data as a new Venue record in the db, instead
     # TODO: modify data to be the data object returned from db insertion
     form = VenueForm(request.form)
-    error = False
-    try:
-        name = form.name.data
-        city = form.city.data
-        state = form.state.data
-        address = form.address.data
-        genres = form.genres.data
-        phone = form.phone.data
-        facebook_link = form.facebook_link.data
-        image_link = form.image_link.data
-        website_link = form.website_link.data
-        seeking_description = form.seeking_description.data
-        seeking_talent = form.seeking_talent.data
+    if form.validate():
+        try:
+            name = form.name.data
+            city = form.city.data
+            state = form.state.data
+            address = form.address.data
+            genres = form.genres.data
+            phone = form.phone.data
+            facebook_link = form.facebook_link.data
+            image_link = form.image_link.data
+            website_link = form.website_link.data
+            seeking_description = form.seeking_description.data
+            seeking_talent = form.seeking_talent.data
 
-        venue = Venue(
-            name=name,
-            city=city,
-            state=state,
-            address=address,
-            phone=phone,
-            facebook_link=facebook_link,
-            image_link=image_link,
-            website_link=website_link,
-            description=seeking_description,
-            seeking_talent=seeking_talent,
-            genres=genres,
-            created_at =  datetime.now()
-        )
+            venue = Venue(
+                name=name,
+                city=city,
+                state=state,
+                address=address,
+                phone=phone,
+                facebook_link=facebook_link,
+                image_link=image_link,
+                website_link=website_link,
+                description=seeking_description,
+                seeking_talent=seeking_talent,
+                genres=genres,
+                created_at =  datetime.now()
+            )
 
-        db.session.add(venue)
-        db.session.commit()
-    except:
-        error = True
-        db.session.rollback()
-        print(sys.exc_info())
-    finally:
-        db.session.close()
-    if error:
+            db.session.add(venue)
+            db.session.commit()
+        except:
+            db.session.rollback()
+            print(sys.exc_info())
+        finally:
+            db.session.close()
+         # on successful db insert, flash success
+        flash("Venue " + request.form["name"] + " was successfully listed!")
+    else:
         flash(
             "An error occurred. Venue " + request.form["name"] + " could not be listed."
         )
-        print(error)
-    else:
-        # on successful db insert, flash success
-        flash("Venue " + request.form["name"] + " was successfully listed!")
     return render_template("pages/home.html")
 
 #  Edit Venue
@@ -257,8 +254,10 @@ def delete_venue(venue_id):
     error = False
     try:
         show = Show.query.filter_by(venue_id=venue_id)
+        print(show)
         show.delete()
         venue = Venue.query.filter_by(id=venue_id)
+        print(venue)
         venue.delete()
         db.session.commit()
     except SQLAlchemyError as e:
@@ -354,47 +353,46 @@ def create_artist_submission():
     # TODO: insert form data as a new Venue record in the db, instead
     # TODO: modify data to be the data object returned from db insertion
     form = ArtistForm(request.form)
-    error = False
-    try:
-        name = form.name.data
-        city = form.city.data
-        state = form.state.data
-        genres = form.genres.data
-        phone = form.phone.data
-        facebook_link = form.facebook_link.data
-        image_link = form.image_link.data
-        website_link = form.website_link.data
-        seeking_description = form.seeking_description.data
-        seeking_venue = form.seeking_venue.data
-        artist = Artist(
-            name=name,
-            city=city,
-            state=state,
-            phone=phone,
-            facebook_link=facebook_link,
-            image_link=image_link,
-            website_link=website_link,
-            description=seeking_description,
-            seeking_venue=seeking_venue,
-            genres=genres,
-        )
+    if form.validate():
+        try:
+            name = form.name.data
+            city = form.city.data
+            state = form.state.data
+            genres = form.genres.data
+            phone = form.phone.data
+            facebook_link = form.facebook_link.data
+            image_link = form.image_link.data
+            website_link = form.website_link.data
+            seeking_description = form.seeking_description.data
+            seeking_venue = form.seeking_venue.data
+            artist = Artist(
+                name=name,
+                city=city,
+                state=state,
+                phone=phone,
+                facebook_link=facebook_link,
+                image_link=image_link,
+                website_link=website_link,
+                description=seeking_description,
+                seeking_venue=seeking_venue,
+                genres=genres,
+            )
 
-        db.session.add(artist)
-        db.session.commit()
-    except:
-        error = True
-        db.session.rollback()
-        print(sys.exc_info())
-    finally:
-        db.session.close()
-    if error:
-        flash("An error occurred.")
-        print(error)
-    else:
+            db.session.add(artist)
+            db.session.commit()
+        except:
+            db.session.rollback()
+            print(sys.exc_info())
+        finally:
+            db.session.close()
         # on successful db insert, flash success
         flash("Artist " + request.form["name"] + " was successfully listed!")
         # TODO: on unsuccessful db insert, flash an error instead.
         # e.g., flash('An error occurred. Artist ' + data.name + ' could not be listed.')
+    else:
+        flash("An error occurred.")
+        print(form.errors)
+
     return render_template("pages/home.html")
 
 #  Edit Artist
