@@ -145,19 +145,20 @@ def create_venue_form():
 def create_venue_submission():
     # TODO: insert form data as a new Venue record in the db, instead
     # TODO: modify data to be the data object returned from db insertion
+    form = VenueForm(request.form)
     error = False
     try:
-        name = request.form["name"]
-        city = request.form["city"]
-        state = request.form["state"]
-        address = request.form["address"]
-        genres = request.form.getlist("genres")
-        phone = request.form["phone"]
-        facebook_link = request.form["facebook_link"]
-        image_link = request.form["image_link"]
-        website_link = request.form["website_link"]
-        seeking_description = request.form["seeking_description"]
-        seeking_talent = bool(request.form.get("seeking_talent", False))
+        name = form.name.data
+        city = form.city.data
+        state = form.state.data
+        address = form.address.data
+        genres = form.genres.data
+        phone = form.phone.data
+        facebook_link = form.facebook_link.data
+        image_link = form.image_link.data
+        website_link = form.website_link.data
+        seeking_description = form.seeking_description.data
+        seeking_talent = form.seeking_talent.data
 
         venue = Venue(
             name=name,
@@ -352,18 +353,19 @@ def create_artist_submission():
     # called upon submitting the new artist listing form
     # TODO: insert form data as a new Venue record in the db, instead
     # TODO: modify data to be the data object returned from db insertion
+    form = ArtistForm(request.form)
     error = False
     try:
-        name = request.form["name"]
-        city = request.form["city"]
-        state = request.form["state"]
-        genres = request.form.getlist("genres")
-        phone = request.form["phone"]
-        facebook_link = request.form["facebook_link"]
-        image_link = request.form["image_link"]
-        website_link = request.form["website_link"]
-        seeking_description = request.form["seeking_description"]
-        seeking_venue = bool(request.form.get("seeking_venue", False))
+        name = form.name.data
+        city = form.city.data
+        state = form.state.data
+        genres = form.genres.data
+        phone = form.phone.data
+        facebook_link = form.facebook_link.data
+        image_link = form.image_link.data
+        website_link = form.website_link.data
+        seeking_description = form.seeking_description.data
+        seeking_venue = form.seeking_venue.data
         artist = Artist(
             name=name,
             city=city,
