@@ -108,19 +108,8 @@ def show_venue(venue_id):
     try:
         # shows the venue page with the given venue_id
         venue = Venue.query.filter_by(id=venue_id).first()
-        past_show = []
-        upcoming_show = []
-        for show in venue.shows:
-            show_detail = {
-                "start_time": show.start_time.strftime("%Y-%m-%d %H:%M:%S"),
-                "artist_image_link": show.artist.image_link,
-                "artist_id": show.artist_id,
-                "artist_name": show.artist.name,
-            }
-            if show.start_time > datetime.now():
-                upcoming_show.append(show_detail)
-            else:
-                past_show.append(show_detail)
+        past_show = db.session.query(Show).join(Artist).filter(Show.venue_id == venue_id).filter(Show.start_time < datetime.now()).all()
+        upcoming_show = db.session.query(Show).join(Artist).filter(Show.venue_id == venue_id).filter(Show.start_time > datetime.now()).all()
         data = {
             "id": venue.id,
             "name": venue.name,
@@ -325,19 +314,8 @@ def search_artists():
 def show_artist(artist_id):
     try:
         artist = Artist.query.filter_by(id=artist_id).first()
-        upcoming_shows = []
-        past_shows = []
-        for show in artist.shows:
-            show_detail = {
-                "start_time": show.start_time.strftime("%Y-%m-%d %H:%M:%S"),
-                "venue_name": show.venue.name,
-                "venue_id": show.venue_id,
-                "venue_image_link": show.venue.image_link,
-            }
-            if show.start_time > datetime.now():
-                upcoming_shows.append(show_detail)
-            else:
-                past_shows.append(show_detail)
+        past_show = db.session.query(Show).join(Venue).filter(Show.artist_id == artist_id).filter(Show.start_time < datetime.now()).all()
+        upcoming_show = db.session.query(Show).join(Venue).filter(Show.artist_id == artist_id).filter(Show.start_time > datetime.now()).all()
         data = {
             "id": artist.id,
             "name": artist.name,
@@ -350,10 +328,10 @@ def show_artist(artist_id):
             "phone": artist.phone,
             "seeking_venue": artist.seeking_venue,
             "seeking_description": artist.description,
-            "upcoming_shows": upcoming_shows,
-            "past_shows": past_shows,
-            "upcoming_shows_count": len(upcoming_shows),
-            "past_shows_count": len(past_shows),
+            "upcoming_shows": upcoming_show,
+            "past_shows": past_show,
+            "upcoming_shows_count": len(upcoming_show),
+            "past_shows_count": len(past_show),
         }
     except SQLAlchemyError as e:
         print(e)
