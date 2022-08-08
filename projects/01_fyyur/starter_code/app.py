@@ -253,12 +253,13 @@ def edit_venue_submission(venue_id):
 def delete_venue(venue_id):
     error = False
     try:
-        show = Show.query.filter_by(venue_id=venue_id)
-        print(show)
-        show.delete()
-        venue = Venue.query.filter_by(id=venue_id)
-        print(venue)
-        venue.delete()
+        shows = Show.query.filter_by(venue_id=venue_id).all()
+        for show in shows:
+            show_delete = db.session.merge(show)
+            db.session.delete(show_delete)
+        venue = Venue.query.filter_by(id=venue_id).first()
+        venue_delete = db.session.merge(venue)
+        db.session.delete(venue_delete)
         db.session.commit()
     except SQLAlchemyError as e:
         print(e)
